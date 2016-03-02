@@ -27,7 +27,6 @@ const headerTarget = {
   hover(props, monitor, component) {
     const dragIndex = monitor.getItem().index;
     const hoverIndex = props.index;
-console.log('dragIndex: ', dragIndex, ' hoverIndex: ', hoverIndex);
     // Don't replace items with themselves
     if (dragIndex === hoverIndex) {
       return;
@@ -36,31 +35,24 @@ console.log('dragIndex: ', dragIndex, ' hoverIndex: ', hoverIndex);
     // Determine rectangle on screen
     const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
 
-    // Get vertical middle
-    const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-
     // Get horizontal middle
     const hoverMiddleX = (hoverBoundingRect.right - hoverBoundingRect.left) / 2;
-console.log('hoverMiddleX: ', hoverMiddleX);
+
     // Determine mouse position
     const clientOffset = monitor.getClientOffset();
 
-    // Get pixels to the top
-    const hoverClientY = clientOffset.y - hoverBoundingRect.top;
-
     // Get pixels to the left
     const hoverClientX = clientOffset.x - hoverBoundingRect.left;
-console.log('hoverClientX: ', hoverClientX);
-    // Only perform the move when the mouse has crossed half of the items height
-    // When dragging downwards, only move when the cursor is below 50%
-    // When dragging upwards, only move when the cursor is above 50%
+    // Only perform the move when the mouse has crossed half of the items width
+    // When dragging downwards, only move when the cursor is right 50%
+    // When dragging left, only move when the cursor is left 50%
 
-    // Dragging downwards
+    // Dragging right
     if (dragIndex < hoverIndex && hoverClientX < hoverMiddleX) {
       return;
     }
 
-    // Dragging upwards
+    // Dragging left
     if (dragIndex > hoverIndex && hoverClientX > hoverMiddleX) {
       return;
     }
@@ -75,12 +67,6 @@ console.log('hoverClientX: ', hoverClientX);
     monitor.getItem().index = hoverIndex;
   }
 };
-
-// const dragHandleSource = {
-//   beginDrag(props) {
-//     return props;
-//   }
-// };
 
 const SortTypes = {
   ASC: 'asc',
