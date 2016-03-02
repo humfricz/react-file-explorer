@@ -1,4 +1,5 @@
 import React from 'react';
+import update from 'react/lib/update';
 import classNames from 'classnames';
 import moment from 'moment';
 import FixedDataTable from 'fixed-data-table';
@@ -157,6 +158,18 @@ let Grid = React.createClass({
               />
     );
   },
+  moveColumn(dragIndex, hoverIndex) {
+    const dragColumn = this.state.columns[dragIndex];
+
+    this.setState(update(this.state, {
+      columns: {
+        $splice: [
+          [dragIndex, 1],
+          [hoverIndex, 0, dragColumn]
+        ]
+      }
+    }));
+  },
   getColumns() {
     const {colSortDirs} = this.props;
 
@@ -167,6 +180,8 @@ let Grid = React.createClass({
           columnKey={column.name}
           header={
             <SortHeaderCell
+              index={index}
+              moveColumn={this.moveColumn}
               onSortChange={this.handleSortChange}
               sortDir={colSortDirs[column.name]}>
               {column.headerText}
