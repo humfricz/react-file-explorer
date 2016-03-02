@@ -6,10 +6,6 @@ import ItemTypes from './itemtypes';
 import { DragSource, DropTarget } from 'react-dnd';
 
 const style = {
-  border: '1px dashed gray',
-  padding: '0.5rem 1rem',
-  marginBottom: '.5rem',
-  headerTarget: 'white',
   cursor: 'move'
 };
 
@@ -87,9 +83,10 @@ class SortHeaderCell extends React.Component {
   render() {
     const { text, isDragging, connectDragSource, connectDropTarget } = this.props;
     var {sortDir, children, ...props} = this.props;
+    const opacity = isDragging ? 0.2 : 1;
 
     return connectDragSource(connectDropTarget(
-      <div style={{opacity: isDragging ? 0.2 : 1}}>
+      <div style={{...style, opacity}}>
         <Cell {...props}>
           <a onClick={this._onSortChange}>
             {children} {sortDir ? (sortDir === SortTypes.DESC ? '↓' : '↑') : ''}

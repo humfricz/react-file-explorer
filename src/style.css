@@ -1,9 +1,9 @@
 .drag-handle:hover {
-  cursor: crosshair;
+  cursor: move;
 }
 
 .selectable:hover {
-  cursor: pointer;
+  cursor: move;
   background: #e8f7fe;
 }
 
