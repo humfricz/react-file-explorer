@@ -1,0 +1,12 @@
+.drag-handle:hover {
+  cursor: crosshair;
+}
+
+.selectable:hover {
+  cursor: pointer;
+  background: #e8f7fe;
+}
+
+.selected {
+  background-color: #c7e2f1;
+}
