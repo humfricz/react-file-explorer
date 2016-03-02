@@ -3,10 +3,10 @@
 }
 
 .selectable:hover {
-  cursor: move;
-  background: #e8f7fe;
+  cursor: pointer;
+  background: #f8f8f8;
 }
 
 .selected {
-  background-color: #c7e2f1;
+  background-color: #8bb98e;
 }
