@@ -194,6 +194,12 @@ let Grid = React.createClass({
       )
     });
   },
+  checkboxCell(props) {
+    return <Cell><input type='checkbox' checked={props.rowIndex === this.props.selectedFileIndex || this.state.checkAll}/></Cell>
+  },
+  handleCheckAll() {
+    this.setState({checkAll: !this.state.checkAll});
+  },
   render() {
     const {colSortDirs} = this.props;
     const {columnWidths} = this.state;
@@ -215,8 +221,8 @@ let Grid = React.createClass({
           width={30}
           />
         <Column
-          header={<Cell><input type='checkbox' /></Cell>}
-          cell={<Cell><input type='checkbox' /></Cell>}
+          header={<Cell><input type='checkbox' onClick={this.handleCheckAll}/></Cell>}
+          cell={this.checkboxCell}
           width={30}
           />
         {this.getColumns()}
