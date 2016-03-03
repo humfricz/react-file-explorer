@@ -203,8 +203,8 @@ let Grid = React.createClass({
         rowsCount={this.props.data.length}
         rowHeight={50}
         headerHeight={50}
-        width={1450}
-        maxHeight={10000}
+        width={1350}
+        maxHeight={700}
         onColumnResizeEndCallback={this.handleColumnResizeEnd}
         isColumnResizing={false}
         >

@@ -32,7 +32,7 @@ const headerTarget = {
     const hoverBoundingRect = findDOMNode(component).getBoundingClientRect();
 
     // Get horizontal middle
-    const hoverMiddleX = (hoverBoundingRect.right - hoverBoundingRect.left) / 2;
+    const hoverMiddleX = (hoverBoundingRect.right - hoverBoundingRect.left) * 2/ 3;
 
     // Determine mouse position
     const clientOffset = monitor.getClientOffset();

@@ -42,9 +42,15 @@ let FileNameCell = React.createClass({
       return '\u25BA';
     }
 
+    const style = {
+      opacity: isOver ? 0.5 : 1,
+      background: isOver ? 'green' : 'white',
+      // borderTop: isOver ? '2px solid green' : 'none'
+    };
+
     return connectDropTarget(
       <div
-        style={{opacity: isOver ? 0.5 : 1}}>
+        style={style}>
         <Cell {...props} onClick={this.handleRowClick.bind(this, rowIndex)} className={getCommonClasses(rowIndex, selectedFileIndex)}>
           <span style={{paddingLeft: (this.props.data[rowIndex].path.length-1)*20}}/>
           {data[rowIndex].type === 'Folder' ?

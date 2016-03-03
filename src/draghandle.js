@@ -19,12 +19,23 @@ function collect(connect, monitor) {
 }
 
 let DragHandleCell = React.createClass({
+  getInitialState() {
+    return {
+      showHandle: false
+    };
+  },
+  handleMouseEnter(e) {
+    this.setState({showHandle: true});
+  },
+  handleMouseOut(e) {
+    this.setState({showHandle: true});
+  },
   render() {
     const dragHandleImage = require('file!./images/drag_handle.jpg');
     let {rowIndex, data, columnKey, ...props} = this.props;
     const { connectDragSource, isDragging } = this.props;
     return connectDragSource(
-      <div>
+      <div onMouseEnter={this.handleMouseEnter} onMouseOut={this.handleMouseOut}>
       <Cell
         {...props}
         style={{
