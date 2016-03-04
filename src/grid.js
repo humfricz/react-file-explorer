@@ -198,7 +198,7 @@ let Grid = React.createClass({
     return <Cell><input type='checkbox' checked={props.rowIndex === this.props.selectedFileIndex || this.state.checkAll}/></Cell>
   },
   handleCheckAll() {
-    this.setState({checkAll: !this.state.checkAll});
+    this.setState({checkAll: !this.state.checkAll})
   },
   render() {
     const {colSortDirs} = this.props;
@@ -216,8 +216,7 @@ let Grid = React.createClass({
         >
         <Column
           header={<Cell></Cell>}
-          cell={<DragHandleCell
-            data={this.props.data}/>}
+          cell={<DragHandleCell data={this.props.data}/>}
           width={30}
           />
         <Column
