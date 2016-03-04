@@ -8,6 +8,7 @@ import documentData from './document_data';
 import {letterSort, numberSort} from './sorters';
 import _ from 'lodash';
 import {getFileSizeString} from './utils';
+
 let clipBoard;
 
 function _flatten(hData, acc) {
@@ -49,7 +50,7 @@ let App = React.createClass({
     return {
       heirarchicalData,
       data: documentData.contents.map((item) => {
-        return Object.assign({}, item, {indentLevel: 0});
+        return _.assign({}, item, {indentLevel: 0});
       }),
       colSortDirs: {},
       selectedFileIndex: -1
