@@ -8,6 +8,8 @@ import documentData from './document_data';
 import {letterSort, numberSort} from './sorters';
 import _ from 'lodash';
 import {getFileSizeString} from './utils';
+import {connect} from 'react-redux';
+import {sortDocuments, moveDocument} from './actions';
 
 let clipBoard;
 
@@ -29,27 +31,10 @@ function flatten(hData) {
   return _flatten(hData, []);
 }
 
-function addPaths(fileData, index, path) {
-  if(fileData.length <= index) {
-    return;
-  }
-
-  fileData[index].path = path.concat(index);
-
-  if(fileData[index].contents && fileData[index].contents.length > 0) {
-    addPaths(fileData[index].contents, 0, fileData[index].path);
-  }
-
-  addPaths(fileData, index + 1, path);
-}
-
 let App = React.createClass({
   getInitialState() {
-    var heirarchicalData = [...documentData.contents];
-    addPaths(heirarchicalData, 0, []);
     return {
-      heirarchicalData,
-      data: documentData.contents.map((item) => {
+      data: this.props.documentTree.contents.map((item) => {
         return _.assign({}, item, {indentLevel: 0});
       }),
       colSortDirs: {},
@@ -157,7 +142,7 @@ let App = React.createClass({
   toggleFolderOpenClose(data) {
     var folderToActOn = this.getFolderFromPath(data);
     folderToActOn.foldedOut = !folderToActOn.foldedOut;
-    this.setState({data: flatten(this.state.heirarchicalData)});
+    this.setState({data: flatten(this.props.documentTree.contents)});
   },
   getCommonClasses(rowIndex) {
     return classNames('selectable', {
@@ -215,32 +200,21 @@ let App = React.createClass({
       </Cell>
     );
   },
-  handleSortChange(columnKey, sortDir) {
-    let sortedHeirarchicalData;
-    if(this.state.lastSortBy === columnKey) {
-      sortedHeirarchicalData = this.state.heirarchicalData.reverse();
-    } else {
-      sortedHeirarchicalData = _.includes(['size', 'date', 'modified_time'], columnKey) ? numberSort(this.state.heirarchicalData, columnKey) : letterSort(this.state.heirarchicalData, columnKey)
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.documentTree !== this.props.documentTree) {
+      this.setState({data: flatten(this.props.documentTree.contents)});
     }
-
-    this.setState({
-      heirarchicalData: sortedHeirarchicalData,
-      data: flatten(sortedHeirarchicalData),
-      lastSortBy: columnKey,
-      colSortDirs: {
-        [columnKey]: sortDir,
-      },
-    });
   },
   render() {
-    const {colSortDirs} = this.state;
+    const {onSortChange, colSortDirs, moveDocument} = this.props;
     const dragHandleImage = require('file!./images/drag_handle.jpg');
+
     return (
       <Grid
         enableKeyOps={true}
         onKeyOps={this.handleKeydown}
         toggleFolderOpenClose={this.toggleFolderOpenClose}
-        onSortChange={this.handleSortChange}
+        onSortChange={onSortChange}
         data={this.state.data}
         colSortDirs={this.state.colSortDirs}
         selectedFileIndex={this.state.selectedFileIndex}
@@ -251,4 +225,18 @@ let App = React.createClass({
   }
 });
 
-export default App;
+function mapStateToProps(state) {
+  return {
+    documentTree: state.documentTree,
+    colSortDirs: state.colSortDirs
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    onSortChange: (columnKey, sortDir) => dispatch(sortDocuments(columnKey, sortDir)),
+    moveDocument: (documentToCopy, folderToCopyIn) => dispatch(moveDocument(documentToCopy, folderToCopyIn))
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
