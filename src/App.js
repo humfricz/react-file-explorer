@@ -9,7 +9,7 @@ import {letterSort, numberSort} from './sorters';
 import _ from 'lodash';
 import {getFileSizeString} from './utils';
 import {connect} from 'react-redux';
-import {sortDocuments, moveDocument} from './actions';
+import {sortDocuments, moveDocument, toggleFolderOpenClose} from './actions';
 
 let clipBoard;
 
@@ -92,13 +92,13 @@ let App = React.createClass({
 
       case 'left': //LEFT
       if(this.state.data[this.state.selectedFileIndex].foldedOut) {
-        this.toggleFolderOpenClose(this.state.data[this.state.selectedFileIndex]);
+        this.props.toggleFolderOpenClose(this.state.data[this.state.selectedFileIndex]);
       }
       break;
 
       case 'right': //RIGHT
       if(!this.state.data[this.state.selectedFileIndex].foldedOut) {
-        this.toggleFolderOpenClose(this.state.data[this.state.selectedFileIndex]);
+        this.props.toggleFolderOpenClose(this.state.data[this.state.selectedFileIndex]);
       }
       break;
 
@@ -138,11 +138,6 @@ let App = React.createClass({
       this.copyDocument(clipBoard, this.state.data[this.state.selectedFileIndex]);
       break;
     }
-  },
-  toggleFolderOpenClose(data) {
-    var folderToActOn = this.getFolderFromPath(data);
-    folderToActOn.foldedOut = !folderToActOn.foldedOut;
-    this.setState({data: flatten(this.props.documentTree.contents)});
   },
   getCommonClasses(rowIndex) {
     return classNames('selectable', {
@@ -206,14 +201,14 @@ let App = React.createClass({
     }
   },
   render() {
-    const {onSortChange, colSortDirs, moveDocument} = this.props;
+    const {onSortChange, colSortDirs, moveDocument, toggleFolderOpenClose} = this.props;
     const dragHandleImage = require('file!./images/drag_handle.jpg');
 
     return (
       <Grid
         enableKeyOps={true}
         onKeyOps={this.handleKeydown}
-        toggleFolderOpenClose={this.toggleFolderOpenClose}
+        toggleFolderOpenClose={toggleFolderOpenClose}
         onSortChange={onSortChange}
         data={this.state.data}
         colSortDirs={this.state.colSortDirs}
@@ -235,8 +230,9 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     onSortChange: (columnKey, sortDir) => dispatch(sortDocuments(columnKey, sortDir)),
-    moveDocument: (documentToCopy, folderToCopyIn) => dispatch(moveDocument(documentToCopy, folderToCopyIn))
-  }
+    moveDocument: (documentToCopy, folderToCopyIn) => dispatch(moveDocument(documentToCopy, folderToCopyIn)),
+    toggleFolderOpenClose: (folder) => dispatch(toggleFolderOpenClose(folder))
+  };
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

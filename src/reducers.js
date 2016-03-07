@@ -79,6 +79,26 @@ export default function reducers(state = {documentTree}, action) {
             contents: sortedContents
           }),
         });
+        tree = {path: [0], contents: [
+          {path: [0,0], contents: [{path: [0,0,0], contents: []}]},
+          {path: [0,1], contents: [{path: [0,1,0], contents: []}]}
+        ]}
+      case actionTypes.FOLDER_FOLD_TOGGLE:
+        function toggleFolderOpenClose(path, tree) {
+          if(path.length === 0) {
+              return _.assign({}, tree, {foldedOut: !tree.foldedOut})
+          }
+
+          return _.assign({}, tree, {contents: [
+            ...tree.contents.slice(0, path[0]),
+            toggleFolderOpenClose(path.slice(1), tree.contents[path[0]]),
+            ...tree.contents.slice(path[0]+1)
+          ]})
+        }
+
+        return _.assign({}, state, {
+          documentTree: toggleFolderOpenClose(action.folder.path, state.documentTree)
+        });
       default:
       return state;
     }
