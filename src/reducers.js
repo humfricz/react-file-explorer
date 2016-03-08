@@ -69,32 +69,35 @@ function deleteDocument(path, tree) {
   })
 }
 
+function sortTree(tree, columnKey, lastSortBy) {
+  let {contents} = tree;
+  let sortedContents;
+  if(lastSortBy === columnKey) {
+    sortedContents = contents.reverse();
+  } else {
+    sortedContents = [..._.includes(['size', 'date', 'modified_time'], columnKey) ? numberSort(contents, columnKey) : letterSort(contents, columnKey)]
+  }
+
+  return _.assign({}, tree, {contents: sortedContents})
+}
+
 export default function reducers(state = {documentTree}, action) {
     switch(action.type) {
       case actionTypes.SORT:
-      const {columnKey, sortDir} = action;
-      let {contents} = state.documentTree;
+        const {columnKey, sortDir} = action;
 
-      let sortedContents;
-      if(state.lastSortBy === columnKey) {
-        sortedContents = contents.reverse();
-      } else {
-        sortedContents = [..._.includes(['size', 'date', 'modified_time'], columnKey) ? numberSort(contents, columnKey) : letterSort(contents, columnKey)]
-      }
-
-      return {
-        documentTree: _.assign({}, state.documentTree, {contents: sortedContents}),
-        lastSortBy: columnKey,
-        colSortDirs: {
-          [columnKey]: sortDir,
-        }
-      };
+        return {
+          documentTree: sortTree(state.documentTree, columnKey, state.lastSortBy),
+          lastSortBy: columnKey,
+          colSortDirs: {
+            [columnKey]: sortDir,
+          }
+        };
       case actionTypes.COPY_DOCUMENT:
         return _.assign({}, state, {
           documentTree: copyDocument(action.documentToCopy, action.folderToCopyIn.path, state.documentTree),
         });
       case actionTypes.MOVE_DOCUMENT:
-      console.log('after deletion: ', deleteDocument(action.documentToMove.path, copyDocument(action.documentToMove, action.folderToCopyIn.path, state.documentTree)));
         return _.assign({}, state, {
           documentTree: deleteDocument(action.documentToMove.path, copyDocument(action.documentToMove, action.folderToCopyIn.path, state.documentTree)),
         });

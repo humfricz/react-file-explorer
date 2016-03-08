@@ -71,13 +71,13 @@ let App = React.createClass({
       break;
 
       case 'left': //LEFT
-      if(this.state.data[this.state.selectedFileIndex].fold_out) {
+      if(this.state.data[this.state.selectedFileIndex].fold_out && this.state.data[this.state.selectedFileIndex].type === 'Folder') {
         this.props.toggleFolderOpenClose(this.state.data[this.state.selectedFileIndex]);
       }
       break;
 
       case 'right': //RIGHT
-      if(!this.state.data[this.state.selectedFileIndex].fold_out) {
+      if(!this.state.data[this.state.selectedFileIndex].fold_out && this.state.data[this.state.selectedFileIndex].type === 'Folder') {
         this.props.toggleFolderOpenClose(this.state.data[this.state.selectedFileIndex]);
       }
       break;
