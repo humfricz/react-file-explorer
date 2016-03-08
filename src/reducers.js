@@ -58,7 +58,7 @@ export default function reducers(state = {documentTree}, action) {
         }
 
         folderToActOn.contents = folderToActOn.contents.concat(_.assign({}, documentToCopy, {path: folderToActOn.path.concat(folderToActOn.path.length)}));
-        folderToActOn.foldedOut = true;
+        folderToActOn.fold_out = true;
 
         return _.assign({}, state, {
           documentTree: _.assign({}, state.documentTree, {
@@ -72,7 +72,7 @@ export default function reducers(state = {documentTree}, action) {
         }
 
         folderToActOn.contents = folderToActOn.contents.concat(_.assign({}, documentToCopy, {path: folderToActOn.path.concat(folderToActOn.path.length)}));
-        folderToActOn.foldedOut = true;
+        folderToActOn.fold_out = true;
 
         return _.assign({}, state, {
           documentTree: _.assign({}, state.documentTree, {
@@ -84,9 +84,13 @@ export default function reducers(state = {documentTree}, action) {
           {path: [0,1], contents: [{path: [0,1,0], contents: []}]}
         ]}
       case actionTypes.FOLDER_FOLD_TOGGLE:
+        if(!action.folder) {
+          return state;
+        }
+
         function toggleFolderOpenClose(path, tree) {
-          if(path.length === 0) {
-              return _.assign({}, tree, {foldedOut: !tree.foldedOut})
+          if(!path || path.length === 0) {
+              return _.assign({}, tree, {fold_out: !tree.fold_out})
           }
 
           return _.assign({}, tree, {contents: [

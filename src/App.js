@@ -19,7 +19,7 @@ function _flatten(hData, acc) {
   }
 
   return hData.reduce((acc2, item) => {
-    if(!item.foldedOut) {
+    if(!item.fold_out) {
       return acc2.concat(item);
     }
 
@@ -48,7 +48,7 @@ let App = React.createClass({
     }
 
     folderToActOn.contents = folderToActOn.contents.concat(_.assign({}, documentToCopy, {path: folderToActOn.path.concat(folderToActOn.path.length)}));
-    folderToActOn.foldedOut = true;
+    folderToActOn.fold_out = true;
     this.setState({data: flatten(this.state.heirarchicalData)});
   },
   getFolderFromPath(folder) {
@@ -67,7 +67,7 @@ let App = React.createClass({
     }
 
     folderToActOn.contents = folderToActOn.contents.concat(_.assign({}, documentToCopy, {path: folderToActOn.path.concat(folderToActOn.path.length)}));
-    folderToActOn.foldedOut = true;
+    folderToActOn.fold_out = true;
     this.setState({data: flatten(this.state.heirarchicalData)});
   },
   handleKeydown(e, combo) {
@@ -91,13 +91,13 @@ let App = React.createClass({
       break;
 
       case 'left': //LEFT
-      if(this.state.data[this.state.selectedFileIndex].foldedOut) {
+      if(this.state.data[this.state.selectedFileIndex].fold_out) {
         this.props.toggleFolderOpenClose(this.state.data[this.state.selectedFileIndex]);
       }
       break;
 
       case 'right': //RIGHT
-      if(!this.state.data[this.state.selectedFileIndex].foldedOut) {
+      if(!this.state.data[this.state.selectedFileIndex].fold_out) {
         this.props.toggleFolderOpenClose(this.state.data[this.state.selectedFileIndex]);
       }
       break;
@@ -196,8 +196,9 @@ let App = React.createClass({
     );
   },
   componentWillReceiveProps(nextProps) {
+    console.log('anything changed? ', nextProps.documentTree !== this.props.documentTree, nextProps.documentTree);
     if(nextProps.documentTree !== this.props.documentTree) {
-      this.setState({data: flatten(this.props.documentTree.contents)});
+      this.setState({data: flatten(nextProps.documentTree.contents)});
     }
   },
   render() {
