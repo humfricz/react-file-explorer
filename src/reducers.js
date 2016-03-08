@@ -29,6 +29,46 @@ function getFolderFromPath(folder, contents) {
 
 addPaths(documentTree.contents, 0, []);
 
+function copyDocument(doc, path, tree) {
+  if(!path || path.length === 0) {
+    let contents = !_.isArray(tree.contents) ? [] : tree.contents;
+    return _.assign({}, tree, {
+      contents: contents.concat(_.assign({}, doc, {path: tree.path.concat(tree.path.length)}))
+    })
+  }
+
+  return _.assign({}, tree, {
+    contents: [
+      ...tree.contents.slice(0, path[0]),
+      copyDocument(doc, path.slice(1), tree.contents[path[0]]),
+      ...tree.contents.slice(path[0]+1)
+    ]
+  })
+}
+
+function subtractOneFromPath(docs) {
+  return docs.map((doc) => _.assign({}, doc, {path: [..._.dropRight(doc.path, 1), _.last(doc.path) - 1]}));
+}
+
+function deleteDocument(path, tree) {
+  if(path.length === 1) {
+    return _.assign({}, tree, {
+      contents: [
+        ...tree.contents.slice(0, path[0]),
+        ...subtractOneFromPath(tree.contents.slice(path[0] + 1))
+      ]
+    })
+  }
+
+  return _.assign({}, tree, {
+    contents: [
+      ...tree.contents.slice(0, path[0]),
+      deleteDocument(path.slice(1), tree.contents[path[0]]),
+      ...tree.contents.slice(path[0]+1)
+    ]
+  })
+}
+
 export default function reducers(state = {documentTree}, action) {
     switch(action.type) {
       case actionTypes.SORT:
@@ -49,40 +89,15 @@ export default function reducers(state = {documentTree}, action) {
           [columnKey]: sortDir,
         }
       };
-
-      case actionTypes.MOVE_DOCUMENT:
-      const {folderToCopyIn, documentToCopy} = action;
-        var folderToActOn = this.getFolderFromPath(folderToCopyIn, state.documentTree.contents);
-        if(!_.isArray(folderToCopyIn.contents)) {
-          folderToActOn.contents = [];
-        }
-
-        folderToActOn.contents = folderToActOn.contents.concat(_.assign({}, documentToCopy, {path: folderToActOn.path.concat(folderToActOn.path.length)}));
-        folderToActOn.fold_out = true;
-
+      case actionTypes.COPY_DOCUMENT:
         return _.assign({}, state, {
-          documentTree: _.assign({}, state.documentTree, {
-            contents: sortedContents
-          }),
+          documentTree: copyDocument(action.documentToCopy, action.folderToCopyIn.path, state.documentTree),
         });
       case actionTypes.MOVE_DOCUMENT:
-        var folderToActOn = this.getFolderFromPath(folderToCopyIn, state.documentTree.contents);
-        if(!_.isArray(folderToCopyIn.contents)) {
-          folderToActOn.contents = [];
-        }
-
-        folderToActOn.contents = folderToActOn.contents.concat(_.assign({}, documentToCopy, {path: folderToActOn.path.concat(folderToActOn.path.length)}));
-        folderToActOn.fold_out = true;
-
+      console.log('after deletion: ', deleteDocument(action.documentToMove.path, copyDocument(action.documentToMove, action.folderToCopyIn.path, state.documentTree)));
         return _.assign({}, state, {
-          documentTree: _.assign({}, state.documentTree, {
-            contents: sortedContents
-          }),
+          documentTree: deleteDocument(action.documentToMove.path, copyDocument(action.documentToMove, action.folderToCopyIn.path, state.documentTree)),
         });
-        tree = {path: [0], contents: [
-          {path: [0,0], contents: [{path: [0,0,0], contents: []}]},
-          {path: [0,1], contents: [{path: [0,1,0], contents: []}]}
-        ]}
       case actionTypes.FOLDER_FOLD_TOGGLE:
         if(!action.folder) {
           return state;

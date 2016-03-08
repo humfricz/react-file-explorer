@@ -1,6 +1,7 @@
 export const actionTypes = {
     SORT: 'SORT',
     MOVE_DOCUMENT: 'MOVE_DOCUMENT',
+    COPY_DOCUMENT: 'COPY_DOCUMENT',
     FOLDER_FOLD_TOGGLE: 'FOLDER_FOLD_TOGGLE'
 };
 
@@ -12,9 +13,17 @@ export function sortDocuments(columnKey, sortDir) {
     };
 }
 
-export function moveDocument(documentToCopy, folderToCopyIn) {
+export function moveDocument(documentToMove, folderToCopyIn) {
     return {
         type: actionTypes.MOVE_DOCUMENT,
+        documentToMove,
+        folderToCopyIn
+    }
+}
+
+export function copyDocument(documentToCopy, folderToCopyIn) {
+    return {
+        type: actionTypes.COPY_DOCUMENT,
         documentToCopy,
         folderToCopyIn
     }

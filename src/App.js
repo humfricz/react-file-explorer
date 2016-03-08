@@ -9,7 +9,7 @@ import {letterSort, numberSort} from './sorters';
 import _ from 'lodash';
 import {getFileSizeString} from './utils';
 import {connect} from 'react-redux';
-import {sortDocuments, moveDocument, toggleFolderOpenClose} from './actions';
+import {sortDocuments, moveDocument, copyDocument, toggleFolderOpenClose} from './actions';
 
 let clipBoard;
 
@@ -41,16 +41,6 @@ let App = React.createClass({
       selectedFileIndex: -1
     };
   },
-  moveDocument(documentToCopy, folderToCopyIn) {
-    var folderToActOn = this.getFolderFromPath(folderToCopyIn);
-    if(!_.isArray(folderToCopyIn.contents)) {
-      folderToActOn.contents = [];
-    }
-
-    folderToActOn.contents = folderToActOn.contents.concat(_.assign({}, documentToCopy, {path: folderToActOn.path.concat(folderToActOn.path.length)}));
-    folderToActOn.fold_out = true;
-    this.setState({data: flatten(this.state.heirarchicalData)});
-  },
   getFolderFromPath(folder) {
     return folder.path.reduce((acc, pathIndex) => {
                           if(_.isArray(acc)) {
@@ -59,16 +49,6 @@ let App = React.createClass({
 
                           return acc.contents[pathIndex];
                         }, this.state.heirarchicalData);
-  },
-  copyDocument(documentToCopy, folderToCopyIn) {
-    var folderToActOn = this.getFolderFromPath(folderToCopyIn);
-    if(!_.isArray(folderToCopyIn.contents)) {
-      folderToActOn.contents = [];
-    }
-
-    folderToActOn.contents = folderToActOn.contents.concat(_.assign({}, documentToCopy, {path: folderToActOn.path.concat(folderToActOn.path.length)}));
-    folderToActOn.fold_out = true;
-    this.setState({data: flatten(this.state.heirarchicalData)});
   },
   handleKeydown(e, combo) {
     switch(combo) {
@@ -104,23 +84,14 @@ let App = React.createClass({
 
       case 'ctrl+c':
       case 'command+c':
-      console.log('lets copy stuff');
       clipBoard = this.state.data[this.state.selectedFileIndex];
+      this.setState({lastCopyAction: 'copy'});
       break;
 
       case 'ctrl+x':
-      case 'command+c':
-      // if nothing in clipboard or pasting in the same place
-      if(!clipBoard || clipBoard.id === this.state.data[this.state.selectedFileIndex].id) {
-        return;
-      }
-
-      // can't paste if the current selection is not a folder
-      if(this.state.data[this.state.selectedFileIndex].type !== 'Folder') {
-        return;
-      }
-
-      this.moveDocument(clipBoard, this.state.data[this.state.selectedFileIndex]);
+      case 'command+x':
+      clipBoard = this.state.data[this.state.selectedFileIndex];
+      this.setState({lastCopyAction: 'move'});
       break;
 
       case 'ctrl+v':
@@ -135,7 +106,12 @@ let App = React.createClass({
         return;
       }
 
-      this.copyDocument(clipBoard, this.state.data[this.state.selectedFileIndex]);
+      if(this.state.lastCopyAction === 'move') {
+        this.props.moveDocument(clipBoard, this.state.data[this.state.selectedFileIndex]);
+      } else {
+        this.props.copyDocument(clipBoard, this.state.data[this.state.selectedFileIndex]);
+      }
+
       break;
     }
   },
@@ -196,13 +172,12 @@ let App = React.createClass({
     );
   },
   componentWillReceiveProps(nextProps) {
-    console.log('anything changed? ', nextProps.documentTree !== this.props.documentTree, nextProps.documentTree);
     if(nextProps.documentTree !== this.props.documentTree) {
       this.setState({data: flatten(nextProps.documentTree.contents)});
     }
   },
   render() {
-    const {onSortChange, colSortDirs, moveDocument, toggleFolderOpenClose} = this.props;
+    const {onSortChange, colSortDirs, moveDocument, copyDocument, toggleFolderOpenClose} = this.props;
     const dragHandleImage = require('file!./images/drag_handle.jpg');
 
     return (
@@ -215,7 +190,7 @@ let App = React.createClass({
         colSortDirs={this.state.colSortDirs}
         selectedFileIndex={this.state.selectedFileIndex}
         onRowClick={this.handleRowClick}
-        onDocumentMove={this.moveDocument}
+        onDocumentMove={moveDocument}
         ></Grid>
     )
   }
@@ -232,6 +207,7 @@ function mapDispatchToProps(dispatch) {
   return {
     onSortChange: (columnKey, sortDir) => dispatch(sortDocuments(columnKey, sortDir)),
     moveDocument: (documentToCopy, folderToCopyIn) => dispatch(moveDocument(documentToCopy, folderToCopyIn)),
+    copyDocument: (documentToCopy, folderToCopyIn) => dispatch(copyDocument(documentToCopy, folderToCopyIn)),
     toggleFolderOpenClose: (folder) => dispatch(toggleFolderOpenClose(folder))
   };
 }
