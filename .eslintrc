@@ -18,7 +18,10 @@
     "babel/no-await-in-loop": 1,
     "react/jsx-uses-react": 2,
     "react/jsx-uses-vars": 2,
-    "react/react-in-jsx-scope": 2
+    "react/react-in-jsx-scope": 2,
+    "new-cap": [2, {
+      "capIsNewExceptions": ["DragDropContext", "DropTarget", "DragSource"]
+    }]
   },
   "plugins": [
     "babel",
